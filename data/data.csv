@@ -1,0 +1,25 @@
+S|E,You are now in a small room.,food|food|food
+S|W,You find yourself,nothing
+S|E,You find yourself in a dining hall. Tables snake up a down the room.,food
+E|W,You find yourself in tiny cupboard. The cupboard is completely bare.,nothing
+S|W,You are now in a ransacked room. Broken tables and chairs litter the floor. Buried beneath the wood you see something.,golden shield
+N|S,You are now in a small room.,food
+N|E,You are now in a small room.,golden sword
+N|S|E|W,You find yourself in a dark room. In the corner you see a skeleton clutching something.,rusty sword
+E|W,You are now in a small room.,golden sword
+N|S|W,You are now in a small room.,golden sword
+N|E,You are now in a small room.,golden sword
+S|E|W,You are now in a small room.,golden sword
+N|S|E|W,You are now in a small room.,golden sword
+W,The monster is in this room!,food
+N|S,You are now in a small room.,golden sword
+E,You are now in a small room.,golden sword
+S|W,You are now in a small room.,golden sword
+N|S|E,You are now in a small room.,golden sword
+S|E|W,You are now in a small room.,golden sword
+N|S|W,You are now in a small room.,golden sword
+E,You are now in a small room.,golden sword
+N|W,You are now in a small room.,golden sword
+N|E,You are now in a small room.,golden sword
+N|E|W,You are now in a small room.,golden sword
+N|W,You are now in a small room.,golden sword
