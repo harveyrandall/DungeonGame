@@ -15,7 +15,7 @@ W,The monster is in this room!,food
 N|S,You are now in a small room.,golden sword
 E,You are now in a small room.,golden sword
 S|W,You are now in a small room.,golden sword
-N|S|E,You are now in a small room.,golden sword
+N|S|E,You are now in a smallish room.,golden sword
 S|E|W,You are now in a small room.,golden sword
 N|S|W,You are now in a small room.,golden sword
 E,You are now in a small room.,golden sword
