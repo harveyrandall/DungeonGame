@@ -23,7 +23,7 @@ class Game {
 		Player player = new Player();
 		Room[] rooms = new Room[25];
 		rooms = initRooms(rooms);
-
+		help();
 		introduction();
 		playGame(player, rooms);
 	}
@@ -41,7 +41,7 @@ class Game {
 		print("\t3. attack\n\t\tYou can use this command to attack the monster when in the same room.");
 		print("\t4. inventory\n\t\tThis will display the contents of your inventory and the amount you have.");
 		print("\t5. help\n\t\tIf you need to see these instructions again typing help will display them.");
-		print("\t6. exit\n\t\tThis will exit the game.");
+		print("\t6. exit\n\t\tThis will exit the game.\n");
 	}
 
 	//Initialise Array List of all the rooms
@@ -73,37 +73,37 @@ class Game {
 	//Controls gameplay and handling of user made moves
 	public static void playGame(Player player, Room[] rooms) {
 		while(getPlayerHealth(player) > 0) {
-			roomDescription(rooms);
+			Room currentRoom = rooms[getPlayerLocation(player)];
+
 			String turn = turn();
-			//validateMove(turn, rooms[getPlayerLocation(player)], player);
 			if(turn.toLowerCase().contains("move")) {
-				String direction = turn.split("move");
-				direction = direction[1].trim();
-				if(stringArrayContains(getRoomDirections(r), direction)) {
-					move(direction);
+				String direction = turn.split("move")[1].trim();
+				if(stringArrayContains(getRoomDirections(currentRoom), direction)) {
+					move(player, rooms, direction);
 				} else {
-					print("That's not a valid move for the room you're currently in. Please take your turn again.");
+					print("You can't go that way! Go again.");
 				}
 			} else if(turn.toLowerCase().contains("eat")) {
-				String item = turn.split("eat");
-				item = item[1].trim();
-				if(stringArrayContains(getPlayerInventory(p), item)) {
-					eat(item);
+				String item = turn.split("eat")[1].trim();
+				if(stringArrayContains(getPlayerInventory(player), item)) {
+					eat(player, item);
 				} else {
-					print("You don't have that in your inventory. Please take your turn again.")
+					print("You don't have that in your inventory. Please take your turn again.");
 				}
 			} else if(turn.trim().equalsIgnoreCase("attack")) {
-				if(getPlayerLocation(p) == 13) {
+				if(getPlayerLocation(player) == 13) {
 					attack(player);
 				}
 			} else if(turn.trim().equalsIgnoreCase("inventory")) {
 				printInventory(player);
 			} else if(turn.trim().equalsIgnoreCase("help")) {
 				help();
+			} else if(turn.trim().equalsIgnoreCase("exit")) {
+				print("Thank you for playing!");
+				System.exit(0);
 			} else {
 				print("I'm not quite sure what you want to do...");
 				print("Take your turn again.");
-				return false;
 			}
 		}
 	}
@@ -115,13 +115,44 @@ class Game {
 	}
 
 	//Move the player in the direction chosen
-	public static void move(String dir) {
-
+	public static void move(Player p, Room[] rooms, String dir) {
+		int location = getPlayerLocation(p);
+		System.out.println(location);
+		if(dir.equalsIgnoreCase("N")) {
+			setPlayerLocation(p, location - 5);
+		} else if(dir.equalsIgnoreCase("S")) {
+			setPlayerLocation(p, location + 5);
+		} else if(dir.equalsIgnoreCase("E")) {
+			setPlayerLocation(p, location + 1);
+		} else if(dir.equalsIgnoreCase("W")) {
+			setPlayerLocation(p, location - 1);
+		}
+		roomDescription(p, rooms[getPlayerLocation(p)]);
 	}
 
 	//Eat an item of food in inventory to heal health
-	public static String eat(String item) {
-
+	public static String eat(Player p, String item) {
+		String[] inv = getPlayerInventory(p);
+		String[] newInventory = new String[inv.length - 1];
+		int index = 0;
+		for(int i = 0;i<inv.length;i++) {
+			if(inv[i].equalsIgnoreCase(item)) {
+				index = i;
+				break;
+			} else {
+				newInventory[i] = inv[i];
+			}
+		}
+		for(int x = index + 1;x < inv.length;x++) {
+			newInventory[x] = inv[x];
+		}
+		setPlayerInventory(p, newInventory);
+		Random r = new Random();
+		int heals = r.nextInt(10);
+		int totalHealth = getPlayerHealth(p);
+		totalHealth = (totalHealth + heals > 100) ? 100 : (totalHealth + heals);
+		setPlayerHealth(p, totalHealth);
+		return ("You have eaten " + item + ". It heals " + heals + " health.");
 	}
 
 	//Attack the monster if you're in the correct room
@@ -132,22 +163,34 @@ class Game {
 	//Print the player's current inventory
 	public static void printInventory(Player p) {
 		String[] inv = getPlayerInventory(p);
-
-		print("")
+		print("*******************");
+		print("Your inventory contains: ");
 		for(int i = 0;i < inv.length;i++) {
+			print(i + ": " + inv[i]);
+		}
+		print("*******************");
+	}
 
+	//Take the items in the room and put them in the player's inventory
+	public static void takeItems(Player p, Room r) {
+		String[] objects = getRoomObjects(r);
+		for(int i = 0;i < objects.length;i++) {
+			setPlayerInventory(p, objects[i]);
 		}
 	}
 
 	//Decide how many points the user receives
-	public static int score() {
+	public static int score(int highest) {
 		Random score = new Random();
-		return score.nextInt(4) + 1;
+		return score.nextInt(highest) + 1;
 	}
 
 	//Print description of the room just entered
-	public static void roomDescription(Room r) {
+	public static void roomDescription(Player p, Room r) {
 		System.out.println(getRoomMessage(r));
+		int roomScore = getRoomMaxScore(r);
+		setPlayerScore(p, score(roomScore));
+		print("Your score is now: " + getPlayerScore(p));
 	}
 
 	//Calculate the maximum score a player can receive from a room
@@ -213,9 +256,9 @@ class Game {
 		}
 		public static Player setPlayerInventory(Player p, String object) {
 			String[] temp = p.inventory;
-			p.inventory = new String[p.inventory.length + 1];
+			p.inventory = new String[temp.length + 1];
 			p.inventory = temp;
-			p.inventory[p.inventory.length - 1] = object;
+			p.inventory[temp.length - 1] = object;
 			return p;
 		}
 
@@ -268,7 +311,8 @@ class Game {
 class Player {
 	int health = 100;
 	int score;
-	String[] inventory;
+	String[] inventory = new String[100];
+	int inventoryItems = 0;
 	int location = 12;
 }
 
