@@ -59,7 +59,7 @@ class Game {
 				String[] data = line.split(",");
 				setRoomMessage(r, data[1]);
 				setRoomDirections(r, data[0].split("|"));
-				setRoomObjects(r, data[2].split("|"));
+				setRoomObject(r, data[2]);
 				setRoomMaxScore(r, calculateMaxScore(r));
 				rooms[count] = r;
 				count++;
@@ -74,12 +74,14 @@ class Game {
 	public static void playGame(Player player, Room[] rooms) {
 		while(getPlayerHealth(player) > 0) {
 			Room currentRoom = rooms[getPlayerLocation(player)];
+			roomDescription(player, currentRoom);
 
 			String turn = turn();
 			if(turn.toLowerCase().contains("move")) {
 				String direction = turn.split("move")[1].trim();
 				if(stringArrayContains(getRoomDirections(currentRoom), direction)) {
-					move(player, rooms, direction);
+					currentRoom = move(player, rooms, direction);
+					takeItems(player, currentRoom);
 				} else {
 					print("You can't go that way! Go again.");
 				}
@@ -91,7 +93,7 @@ class Game {
 					print("You don't have that in your inventory. Please take your turn again.");
 				}
 			} else if(turn.trim().equalsIgnoreCase("attack")) {
-				if(getPlayerLocation(player) == 13) {
+				if(monsterInRoom(player)) {
 					attack(player);
 				}
 			} else if(turn.trim().equalsIgnoreCase("inventory")) {
@@ -115,9 +117,8 @@ class Game {
 	}
 
 	//Move the player in the direction chosen
-	public static void move(Player p, Room[] rooms, String dir) {
+	public static Room move(Player p, Room[] rooms, String dir) {
 		int location = getPlayerLocation(p);
-		System.out.println(location);
 		if(dir.equalsIgnoreCase("N")) {
 			setPlayerLocation(p, location - 5);
 		} else if(dir.equalsIgnoreCase("S")) {
@@ -127,7 +128,7 @@ class Game {
 		} else if(dir.equalsIgnoreCase("W")) {
 			setPlayerLocation(p, location - 1);
 		}
-		roomDescription(p, rooms[getPlayerLocation(p)]);
+		return rooms[getPlayerLocation(p)];
 	}
 
 	//Eat an item of food in inventory to heal health
@@ -173,10 +174,22 @@ class Game {
 
 	//Take the items in the room and put them in the player's inventory
 	public static void takeItems(Player p, Room r) {
-		String[] objects = getRoomObjects(r);
-		for(int i = 0;i < objects.length;i++) {
-			setPlayerInventory(p, objects[i]);
+		String[] inventory = getPlayerInventory(p);
+		String object = getRoomObject(r);
+		String[] newInventory;
+
+		if(inventory == null) {
+			newInventory = new String[1];
+			newInventory[0] = object;
+		} else {
+			newInventory = new String[inventory.length + 1];
+			for(int i = 0;i < inventory.length;i++) {
+				newInventory[i] = inventory[i];
+			}
+			newInventory[inventory.length] = object;
 		}
+		newInventory = sortInventory(newInventory);
+		setPlayerInventory(p, newInventory);
 	}
 
 	//Decide how many points the user receives
@@ -195,17 +208,38 @@ class Game {
 
 	//Calculate the maximum score a player can receive from a room
 	public static int calculateMaxScore(Room r) {
-		String[] roomObjects = getRoomObjects(r);
-		int score = roomObjects.length;
-		int multiplier = 1;
-		for(int i = 0; i < roomObjects.length;i++) {
-			if(roomObjects[i].contains("golden")) {
-				multiplier = 3;
-			} else if(roomObjects[i].contains("food")) {
-				multiplier = 2;
+		String roomObject = getRoomObject(r);
+		int score = 1;
+		if(roomObject.contains("golden")) {
+			score = 3;
+		} else if(roomObject.contains("food")) {
+			score = 2;
+		}
+		return score;
+	}
+
+	//Returns a boolean as to whether the monster is in the current room
+	public static boolean monsterInRoom(Player p) {
+		if(getPlayerLocation(p) == 13) {
+			return true;
+		}
+		return false;
+	}
+
+	//Sort the players inventory in to alphabetical order
+	public static String[] sortInventory(String[] inventory) {
+		if(inventory.length > 1) {
+			for(int pass = 0;pass < inventory.length - 1; pass++) {
+				for(int i = 0;i < inventory.length - 1;i++) {
+					if(inventory[i].compareTo(inventory[i + 1]) > 0) {
+						String tmp = inventory[i + 1];
+						inventory[i + 1] = inventory[i];
+						inventory[i] = tmp;
+					}
+				}
 			}
 		}
-		return (score * multiplier);
+		return inventory;
 	}
 
 	//Check whether a given string array contains a given value
@@ -254,11 +288,8 @@ class Game {
 		public static String[] getPlayerInventory(Player p) {
 			return p.inventory;
 		}
-		public static Player setPlayerInventory(Player p, String object) {
-			String[] temp = p.inventory;
-			p.inventory = new String[temp.length + 1];
-			p.inventory = temp;
-			p.inventory[temp.length - 1] = object;
+		public static Player setPlayerInventory(Player p, String[] objects) {
+			p.inventory = objects;
 			return p;
 		}
 
@@ -289,11 +320,11 @@ class Game {
 			return r;
 		}
 
-		public static String[] getRoomObjects(Room r) {
-			return r.objects;
+		public static String getRoomObject(Room r) {
+			return r.object;
 		}
-		public static Room setRoomObjects(Room r, String[] objects) {
-			r.objects = objects;
+		public static Room setRoomObject(Room r, String object) {
+			r.object = object;
 			return r;
 		}
 
@@ -311,7 +342,7 @@ class Game {
 class Player {
 	int health = 100;
 	int score;
-	String[] inventory = new String[100];
+	String[] inventory;
 	int inventoryItems = 0;
 	int location = 12;
 }
@@ -319,6 +350,10 @@ class Player {
 class Room {
 	String message;
 	String[] directions;
-	String[] objects;
+	String object;
 	int maxScore;
+}
+
+class Monster {
+	int health = 300;
 }
