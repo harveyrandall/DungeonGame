@@ -39,20 +39,31 @@ class Game {
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			int count = 0;
 
-			if(bufferedReader.readLine() != null) {
-				Scanner scanner = new Scanner(System.in);
-				System.out.print("There is a saved game available. Would you like to load it? Y/N ");
-				String response = scanner.nextLine();
+			Scanner scanner = new Scanner(System.in);
+			System.out.print("There is a saved game available. Would you like to load it? Y/N ");
+			String response = scanner.nextLine();
 
-				if(response.equalsIgnoreCase("y") || response.equalsIgnoreCase("yes")) {
-					while((line = bufferedReader.readLine()) != null) {
-						//health score inventory location
-						lines[count] = line;
-						count++;
-					}
-				} else {
-					print("Okay. Starting new game...");
+			if(response.equalsIgnoreCase("y") || response.equalsIgnoreCase("yes")) {
+				while((line = bufferedReader.readLine()) != null) {
+					//health score inventory location
+					lines[count] = line;
+					print(line);
+					count++;
 				}
+
+				if(count > 0) {
+					int health = Integer.parseInt(lines[0]);
+					int score = Integer.parseInt(lines[1]);
+					String[] inventory = convertToArray(lines[2]);
+					int location = Integer.parseInt(lines[3]);
+
+					setPlayerHealth(p, health);
+					setPlayerScore(p, score);
+					setPlayerInventory(p, inventory);
+					setPlayerLocation(p, location);
+				}
+			} else {
+				print("Okay. Starting new game...");
 			}
 		} catch(IOException e) {
 			System.out.println(e);
@@ -333,6 +344,12 @@ class Game {
 			}
 		}
 		return arrString;
+	}
+
+	//Convert a comma separated string to a String array
+	public static String[] convertToArray(String s) {
+		String[] arr = s.split(",");
+		return arr;
 	}
 
 	//Check whether a given string array contains a given value
