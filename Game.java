@@ -220,9 +220,9 @@ class Game {
 
 	//Saves the current game state so the user can come back at a later time
 	public static void save(Player p) {
-		String health = Integer.toString(getPlayerHealth(p));
-		String score = Integer.toString(getPlayerScore(p));
-		String inventory = convertToString(getPlayerInventory(p));
+		String health = Integer.toString(getPlayerHealth(p)) + "\n";
+		String score = Integer.toString(getPlayerScore(p)) + "\n";
+		String inventory = convertToString(getPlayerInventory(p)) + "\n";
 		String location = Integer.toString(getPlayerLocation(p));
 
 		final String fileName = "data/save.csv";
