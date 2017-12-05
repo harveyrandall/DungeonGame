@@ -41,13 +41,13 @@ class Game {
 
 			if(bufferedReader.readLine() != null) {
 				Scanner scanner = new Scanner(System.in);
-				System.out.print("There is a saved game available. Would you like to load it? Y/N ")
+				System.out.print("There is a saved game available. Would you like to load it? Y/N ");
 				String response = scanner.nextLine();
 
 				if(response.equalsIgnoreCase("y") || response.equalsIgnoreCase("yes")) {
 					while((line = bufferedReader.readLine()) != null) {
 						//health score inventory location
-						String[count] = line;
+						lines[count] = line;
 						count++;
 					}
 				} else {
@@ -128,12 +128,12 @@ class Game {
 				if(monsterInRoom(player)) {
 					attack(player);
 				} else {
-					print("The monster doesn't appear to be in this room, there is nothing to attack.")
+					print("The monster doesn't appear to be in this room, there is nothing to attack.");
 				}
 			} else if(turn.trim().equalsIgnoreCase("inventory")) {
 				printInventory(player);
 			} else if(turn.trim().equalsIgnoreCase("save")) {
-				save(Player player);
+				save(player);
 			} else if(turn.trim().equalsIgnoreCase("help")) {
 				help();
 			} else if(turn.trim().equalsIgnoreCase("exit")) {
@@ -209,7 +209,7 @@ class Game {
 
 	//Saves the current game state so the user can come back at a later time
 	public static void save(Player p) {
-		String health = Integer.toSring(getPlayerHealth(p));
+		String health = Integer.toString(getPlayerHealth(p));
 		String score = Integer.toString(getPlayerScore(p));
 		String inventory = convertToString(getPlayerInventory(p));
 		String location = Integer.toString(getPlayerLocation(p));
@@ -217,8 +217,8 @@ class Game {
 		final String fileName = "data/save.csv";
 
 		try {
-			FileWriter FileWriter = new FileReader(fileName);
-			BufferedWriter bufferedWriter = new BufferedReader(fileWriter);
+			FileWriter fileWriter = new FileWriter(fileName);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
 			bufferedWriter.write(health);
 			bufferedWriter.write(score);
