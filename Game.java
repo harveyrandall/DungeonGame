@@ -274,6 +274,7 @@ class Game {
 			newInventory = sortInventory(newInventory);
 			setPlayerInventory(p, newInventory);
 			print(object + " has been added to your inventory.");
+			setRoomObject(r, "nothing");
 		}
 	}
 
