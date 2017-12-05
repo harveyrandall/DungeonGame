@@ -132,28 +132,38 @@ class Game {
 	}
 
 	//Eat an item of food in inventory to heal health
-	public static String eat(Player p, String item) {
-		String[] inv = getPlayerInventory(p);
-		String[] newInventory = new String[inv.length - 1];
-		int index = 0;
-		for(int i = 0;i<inv.length;i++) {
-			if(inv[i].equalsIgnoreCase(item)) {
-				index = i;
-				break;
+	public static void eat(Player p, String item) {
+		int health = getPlayerHealth(p);
+		if(health != 100) {
+			if(item.contains("golden")) {
+				print("You cannot eat a " + item + "! It's an object, not food!");
 			} else {
-				newInventory[i] = inv[i];
+				String[] inventory = getPlayerInventory(p);
+				if(inventory.length > 1) {
+					int itemIndex = 0;
+					for(int i =0; i < inventory.length; i++) {
+						if(inventory[i].equalsIgnoreCase(item)) {
+							itemIndex = i;
+						}
+					}
+					String[] newInventory = new String[inventory.length - 1];
+					for(int j = 0;j<itemIndex;j++) {
+						newInventory[j] = inventory[j];
+					}
+					for(int k = itemIndex + 1;k<inventory.length;k++) {
+						newInventory[itemIndex] = inventory[k];
+						itemIndex++;
+					}
+					setPlayerInventory(p, newInventory);
+				} else {
+					String[] newInventory = null;
+					setPlayerInventory(p, newInventory);
+				}
+				print("You have eaten some " + item);
 			}
+		} else {
+			print("You have full health, you don't need to eat anything!");
 		}
-		for(int x = index + 1;x < inv.length;x++) {
-			newInventory[x] = inv[x];
-		}
-		setPlayerInventory(p, newInventory);
-		Random r = new Random();
-		int heals = r.nextInt(10);
-		int totalHealth = getPlayerHealth(p);
-		totalHealth = (totalHealth + heals > 100) ? 100 : (totalHealth + heals);
-		setPlayerHealth(p, totalHealth);
-		return ("You have eaten " + item + ". It heals " + heals + " health.");
 	}
 
 	//Attack the monster if you're in the correct room
@@ -167,29 +177,32 @@ class Game {
 		print("*******************");
 		print("Your inventory contains: ");
 		for(int i = 0;i < inv.length;i++) {
-			print(i + ": " + inv[i]);
+			print((i+1) + ": " + inv[i]);
 		}
 		print("*******************");
 	}
 
 	//Take the items in the room and put them in the player's inventory
 	public static void takeItems(Player p, Room r) {
-		String[] inventory = getPlayerInventory(p);
 		String object = getRoomObject(r);
-		String[] newInventory;
+		if(!object.equalsIgnoreCase("nothing")) {
+			String[] inventory = getPlayerInventory(p);
+			String[] newInventory;
 
-		if(inventory == null) {
-			newInventory = new String[1];
-			newInventory[0] = object;
-		} else {
-			newInventory = new String[inventory.length + 1];
-			for(int i = 0;i < inventory.length;i++) {
-				newInventory[i] = inventory[i];
+			if(inventory == null) {
+				newInventory = new String[1];
+				newInventory[0] = object;
+			} else {
+				newInventory = new String[inventory.length + 1];
+				for(int i = 0;i < inventory.length;i++) {
+					newInventory[i] = inventory[i];
+				}
+				newInventory[inventory.length] = object;
 			}
-			newInventory[inventory.length] = object;
+			newInventory = sortInventory(newInventory);
+			setPlayerInventory(p, newInventory);
+			print(object + " has been added to your inventory.");
 		}
-		newInventory = sortInventory(newInventory);
-		setPlayerInventory(p, newInventory);
 	}
 
 	//Decide how many points the user receives
@@ -340,7 +353,7 @@ class Game {
 }
 
 class Player {
-	int health = 100;
+	int health = 80;
 	int score;
 	String[] inventory;
 	int inventoryItems = 0;
