@@ -23,9 +23,40 @@ class Game {
 		Player player = new Player();
 		Room[] rooms = new Room[25];
 		rooms = initRooms(rooms);
+		loadSave(player);
 		help();
 		introduction();
 		playGame(player, rooms);
+	}
+
+	public static void loadSave(Player p) {
+		final String fileName = "data/save.csv";
+		String line = null;
+		String[] lines = new String[4];
+
+		try{
+			FileReader fileReader = new FileReader(fileName);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			int count = 0;
+
+			if(bufferedReader.readLine() != null) {
+				Scanner scanner = new Scanner(System.in);
+				System.out.print("There is a saved game available. Would you like to load it? Y/N ")
+				String response = scanner.nextLine();
+
+				if(response.equalsIgnoreCase("y") || response.equalsIgnoreCase("yes")) {
+					while((line = bufferedReader.readLine()) != null) {
+						//health score inventory location
+						String[count] = line;
+						count++;
+					}
+				} else {
+					print("Okay. Starting new game...");
+				}
+			}
+		} catch(IOException e) {
+			System.out.println(e);
+		}
 	}
 
 	//Print introduction to the game
@@ -211,6 +242,7 @@ class Game {
 		print("*******************");
 	}
 
+	//@TODO Remove item from room once taken
 	//Take the items in the room and put them in the player's inventory
 	public static void takeItems(Player p, Room r) {
 		String object = getRoomObject(r);
