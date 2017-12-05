@@ -40,13 +40,14 @@ class Game {
 		print("\t2. eat <food>\n\t\tWhere food is one of the pieces of food you have in your inventory.");
 		print("\t3. attack\n\t\tYou can use this command to attack the monster when in the same room.");
 		print("\t4. inventory\n\t\tThis will display the contents of your inventory and the amount you have.");
-		print("\t5. help\n\t\tIf you need to see these instructions again typing help will display them.");
-		print("\t6. exit\n\t\tThis will exit the game.\n");
+		print("\t5. save\n\t\tThis will save the current game state so you can resume playing at a later date.");
+		print("\t6. help\n\t\tIf you need to see these instructions again typing help will display them.");
+		print("\t7. exit\n\t\tThis will exit the game.\n");
 	}
 
 	//Initialise Array List of all the rooms
 	public static Room[] initRooms(Room[] rooms) {
-		String fileName = "data/data.csv";
+		final String fileName = "data/data.csv";
 		String line = null;
 
 		try {
@@ -64,7 +65,7 @@ class Game {
 				rooms[count] = r;
 				count++;
 			}
-		} catch(Exception e) {
+		} catch(IOException e) {
 			System.out.println(e);
 		}
 		return rooms;
@@ -95,9 +96,13 @@ class Game {
 			} else if(turn.trim().equalsIgnoreCase("attack")) {
 				if(monsterInRoom(player)) {
 					attack(player);
+				} else {
+					print("The monster doesn't appear to be in this room, there is nothing to attack.")
 				}
 			} else if(turn.trim().equalsIgnoreCase("inventory")) {
 				printInventory(player);
+			} else if(turn.trim().equalsIgnoreCase("save")) {
+				save(Player player);
 			} else if(turn.trim().equalsIgnoreCase("help")) {
 				help();
 			} else if(turn.trim().equalsIgnoreCase("exit")) {
@@ -169,6 +174,30 @@ class Game {
 	//Attack the monster if you're in the correct room
 	public static void attack(Player p) {
 
+	}
+
+	//Saves the current game state so the user can come back at a later time
+	public static void save(Player p) {
+		String health = Integer.toSring(getPlayerHealth(p));
+		String score = Integer.toString(getPlayerScore(p));
+		String inventory = convertToString(getPlayerInventory(p));
+		String location = Integer.toString(getPlayerLocation(p));
+
+		final String fileName = "data/save.csv";
+
+		try {
+			FileWriter FileWriter = new FileReader(fileName);
+			BufferedWriter bufferedWriter = new BufferedReader(fileWriter);
+
+			bufferedWriter.write(health);
+			bufferedWriter.write(score);
+			bufferedWriter.write(inventory);
+			bufferedWriter.write(location);
+
+			bufferedWriter.close();
+		} catch(IOException e) {
+			System.out.println(e);
+		}
 	}
 
 	//Print the player's current inventory
@@ -258,6 +287,20 @@ class Game {
 			}
 		}
 		return inventory;
+	}
+
+
+	//Convert a String array to a comma separated string
+	public static String convertToString(String[] arr) {
+		String arrString = "";
+		for(int i = 0;i<arr.length;i++) {
+			if(i != (arr.length - 1) ) {
+				arrString = arrString + arr[i] + ",";
+			} else {
+				arrString = arrString + arr[i];
+			}
+		}
+		return arrString;
 	}
 
 	//Check whether a given string array contains a given value
@@ -358,10 +401,9 @@ class Game {
 }
 
 class Player {
-	int health = 80;
+	int health = 100;
 	int score;
 	String[] inventory;
-	int inventoryItems = 0;
 	int location = 12;
 }
 
