@@ -74,7 +74,6 @@ class Game {
 	public static void playGame(Player player, Room[] rooms) {
 		while(getPlayerHealth(player) > 0) {
 			Room currentRoom = rooms[getPlayerLocation(player)];
-			roomDescription(player, currentRoom);
 
 			String turn = turn();
 			if(turn.toLowerCase().contains("move")) {
@@ -82,6 +81,7 @@ class Game {
 				if(stringArrayContains(getRoomDirections(currentRoom), direction)) {
 					currentRoom = move(player, rooms, direction);
 					takeItems(player, currentRoom);
+					roomDescription(player, currentRoom);
 				} else {
 					print("You can't go that way! Go again.");
 				}
@@ -206,16 +206,21 @@ class Game {
 	}
 
 	//Decide how many points the user receives
-	public static int score(int highest) {
+	public static int score(Player p, int highest) {
 		Random score = new Random();
-		return score.nextInt(highest) + 1;
+		int multiplier = 1;
+		if(getPlayerScore(p) >= 20) {
+			multiplier = getPlayerScore(p)/10;
+		}
+		return (score.nextInt(highest) + 1)*multiplier;
 	}
 
 	//Print description of the room just entered
 	public static void roomDescription(Player p, Room r) {
 		System.out.println(getRoomMessage(r));
 		int roomScore = getRoomMaxScore(r);
-		setPlayerScore(p, score(roomScore));
+		int score = score(p, roomScore);
+		setPlayerScore(p, score);
 		print("Your score is now: " + getPlayerScore(p));
 	}
 
@@ -365,8 +370,4 @@ class Room {
 	String[] directions;
 	String object;
 	int maxScore;
-}
-
-class Monster {
-	int health = 300;
 }
