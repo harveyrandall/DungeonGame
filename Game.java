@@ -253,7 +253,6 @@ class Game {
 		print("*******************");
 	}
 
-	//@TODO Remove item from room once taken
 	//Take the items in the room and put them in the player's inventory
 	public static void takeItems(Player p, Room r) {
 		String object = getRoomObject(r);
