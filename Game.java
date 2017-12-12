@@ -114,6 +114,7 @@ class Game {
 
 	//Controls gameplay and handling of user made moves
 	public static void playGame(Player player, Room[] rooms) {
+		int monsterHealth = 100;
 		while(getPlayerHealth(player) > 0) {
 			Room currentRoom = rooms[getPlayerLocation(player)];
 
@@ -136,7 +137,10 @@ class Game {
 				}
 			} else if(turn.trim().equalsIgnoreCase("attack")) {
 				if(monsterInRoom(player)) {
-					attack(player);
+					monsterHealth = attack(player, monsterHealth);
+					if(monsterHealth <= 0) {
+						gameWon(player);
+					}
 				} else {
 					print("The monster doesn't appear to be in this room, there is nothing to attack.");
 				}
@@ -154,6 +158,7 @@ class Game {
 				print("Take your turn again.");
 			}
 		}
+		gameOver(player);
 	}
 
 	//User picks a direction to move
@@ -213,8 +218,33 @@ class Game {
 	}
 
 	//Attack the monster if you're in the correct room
-	public static void attack(Player p) {
+	public static int attack(Player p, int monsterHealth) {
+		Random r = new Random();
+		int playerHealth = getPlayerHealth(p);
+		int hit = 0;
 
+		if(stringArrayContains(getPlayerInventory(p), "golden sword")) {
+			hit = r.nextInt(7) + 4;
+		} else {
+			hit = r.nextInt(5) + 1;
+		}
+		monsterHealth = monsterHealth - hit;
+		playerHealth = playerHealth - monsterAttack(p);
+		setPlayerHealth(p, playerHealth);
+		return monsterHealth;
+	}
+
+	public static int monsterAttack(Player p) {
+		Random r = new Random();
+		int hit = (r.nextInt(10) + 1);
+
+		if(stringArrayContains(getPlayerInventory(p), "golden shield")) {
+			hit = hit/2;
+		} else if(stringArrayContains(getPlayerInventory(p), "wooden shield")) {
+			hit = (hit/4) * 3;
+		}
+
+		return hit;
 	}
 
 	//Saves the current game state so the user can come back at a later time
@@ -240,6 +270,18 @@ class Game {
 		}
 	}
 
+	//Tells the player they have won the game
+	public static void gameWon(Player p) {
+		print("Congratulations, you have defeated the monster!");
+		print("Your final score is: " + getPlayerScore(p));
+	}
+
+	//Tells the player the game is over as they have lost all health
+	public static void gameOver(Player p) {
+		print("Game Over!");
+		print("The monster has defeated you!");
+		print("Your final score is: " + getPlayerScore(p));
+	}
 	//Print the player's current inventory
 	public static void printInventory(Player p) {
 		String[] inv = getPlayerInventory(p);
