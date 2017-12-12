@@ -90,14 +90,13 @@ class Game {
 	//Initialise Array List of all the rooms
 	public static Room[] initRooms(Room[] rooms) {
 		final String fileName = "data/data.csv";
-		String line = null;
 
 		try {
-			FileReader fileReader = new FileReader(fileName);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			int count = 0;
+			String line = br.readLine();
 
-			while((line = bufferedReader.readLine()) != null) {
+			while(line != null) {
 				Room r = new Room();
 				String[] data = line.split(",");
 				setRoomMessage(r, data[1]);
@@ -106,6 +105,7 @@ class Game {
 				setRoomMaxScore(r, calculateMaxScore(r));
 				rooms[count] = r;
 				count++;
+				line = br.readLine();
 			}
 		} catch(IOException e) {
 			System.out.println(e);
@@ -220,23 +220,22 @@ class Game {
 
 	//Saves the current game state so the user can come back at a later time
 	public static void save(Player p) {
-		String health = Integer.toString(getPlayerHealth(p)) + "\n";
-		String score = Integer.toString(getPlayerScore(p)) + "\n";
-		String inventory = convertToString(getPlayerInventory(p)) + "\n";
+		String health = Integer.toString(getPlayerHealth(p));
+		String score = Integer.toString(getPlayerScore(p));
+		String inventory = convertToString(getPlayerInventory(p));
 		String location = Integer.toString(getPlayerLocation(p));
 
 		final String fileName = "data/save.csv";
 
 		try {
-			FileWriter fileWriter = new FileWriter(fileName);
-			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			PrintWriter pw = new PrintWriter(new FileWriter(fileName));
 
-			bufferedWriter.write(health);
-			bufferedWriter.write(score);
-			bufferedWriter.write(inventory);
-			bufferedWriter.write(location);
+			pw.println(health);
+			pw.println(score);
+			pw.println(inventory);
+			pw.print(location);
 
-			bufferedWriter.close();
+			pw.close();
 		} catch(IOException e) {
 			System.out.println(e);
 		}
