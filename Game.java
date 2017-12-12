@@ -31,23 +31,23 @@ class Game {
 
 	public static void loadSave(Player p) {
 		final String fileName = "data/save.csv";
-		String line = null;
 		String[] lines = new String[4];
 
 		try{
-			FileReader fileReader = new FileReader(fileName);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			int count = 0;
+			String line = br.readLine();
 
 			Scanner scanner = new Scanner(System.in);
 			System.out.print("There is a saved game available. Would you like to load it? Y/N ");
 			String response = scanner.nextLine();
 
 			if(response.equalsIgnoreCase("y") || response.equalsIgnoreCase("yes")) {
-				while((line = bufferedReader.readLine()) != null) {
+				while(line != null) {
 					//health score inventory location
 					lines[count] = line;
 					count++;
+					line = br.readLine();
 				}
 
 				if(count > 0) {
