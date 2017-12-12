@@ -47,7 +47,6 @@ class Game {
 				while((line = bufferedReader.readLine()) != null) {
 					//health score inventory location
 					lines[count] = line;
-					print(line);
 					count++;
 				}
 
